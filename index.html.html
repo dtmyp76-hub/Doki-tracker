@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Doki Tracker V2 – Emergent Style</title>
+<style>
+:root{
+  --bg:#050311;
+  --bg2:#0a0720;
+  --panel:#0d0a22ee;
+  --panel2:#121033ee;
+  --line:#2fe3ff55;
+  --line2:#a855f755;
+  --text:#f7f8ff;
+  --muted:#aeb3d8;
+  --cyan:#2fe3ff;
+  --blue:#66b3ff;
+  --purple:#a855f7;
+  --pink:#ff5fd2;
+  --green:#45ff9f;
+  --red:#ff6f8f;
+  --gold:#ffcf5c;
+  --radius:26px;
+  --shadow:0 0 28px rgba(81,110,255,.16), 0 0 80px rgba(168,85,247,.12), inset 0 0 0 1px rgba(255,255,255,.03);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,95,210,.12), transparent 24%),
+    radial-gradient(circle at 80% 12%, rgba(47,227,255,.12), transparent 24%),
+    radial-gradient(circle at 50% 80%, rgba(168,85,247,.16), transparent 28%),
+    linear-gradient(180deg, #060411 0%, #09061b 40%, #050311 100%);
+}
+body:before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; opacity:.16;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(106,180,255,.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255,120,220,.48) 0 1px, transparent 1.5px);
+  background-size:110px 110px, 180px 180px, 240px 240px;
+  background-position:0 0, 40px 70px, 90px 20px;
+}
+.app{
+  position:relative; z-index:1;
+  max-width:1120px;
+  margin:0 auto;
+  padding:
+    max(14px, env(safe-area-inset-top))
+    12px
+    calc(96px + env(safe-area-inset-bottom))
+    12px;
+}
+.top{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px;
+}
+.logo h1{
+  margin:0;
+  font-size:clamp(1.9rem, 7vw, 3.2rem);
+  letter-spacing:.08em;
+  font-weight:900;
+  background:linear-gradient(90deg,#fff 0%, #9be6ff 28%, #d598ff 60%, #fff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.logo p{margin:.28rem 0 0; color:var(--muted); font-size:.98rem}
+.actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+button,.btn{
+  border:none; cursor:pointer; color:#fff;
+  background:linear-gradient(135deg, rgba(168,85,247,.95), rgba(255,95,210,.92));
+  padding:12px 14px; border-radius:18px; font-weight:800; font-size:.95rem;
+  box-shadow:0 8px 24px rgba(168,85,247,.18);
+}
+button.secondary,.btn.secondary{
+  background:rgba(16,13,39,.95); border:1px solid rgba(255,255,255,.08); box-shadow:var(--shadow)
+}
+button.ghost{
+  background:transparent; border:1px solid rgba(255,255,255,.12); box-shadow:none
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1.18fr .82fr;
+  gap:14px;
+}
+
+.panel{
+  background:linear-gradient(180deg, rgba(12,9,32,.94), rgba(8,7,21,.96));
+  border:1px solid rgba(102,179,255,.14);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.hero{
+  padding:14px;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(47,227,255,.09), transparent 24%),
+    radial-gradient(circle at 85% 10%, rgba(255,95,210,.12), transparent 24%),
+    radial-gradient(circle at 60% 85%, rgba(168,85,247,.14), transparent 28%),
+    linear-gradient(180deg, rgba(12,9,32,.96), rgba(8,7,21,.98));
+}
+.heroInner{
+  border:2px solid rgba(47,227,255,.18);
+  border-radius:24px;
+  padding:14px;
+  background:
+    linear-gradient(180deg, rgba(11,15,45,.55), rgba(10,8,24,.35));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 22px rgba(47,227,255,.08);
+}
+.heroHeader{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+}
+.heroTitle{
+  display:flex; flex-direction:column; gap:4px;
+}
+.heroTag{
+  display:inline-flex; align-items:center; gap:8px;
+  align-self:flex-start;
+  color:#ffd76f;
+  background:rgba(255,207,92,.10);
+  border:1px solid rgba(255,207,92,.2);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:900;
+  font-size:.82rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.name{
+  margin:.35rem 0 0;
+  font-size:clamp(2rem, 8vw, 4rem);
+  line-height:.95;
+  letter-spacing:.04em;
+  font-weight:900;
+}
+.role{
+  color:#cbd2ff;
+  font-size:clamp(.98rem, 3vw, 1.18rem);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.levelBadge{
+  min-width:110px;
+  border-radius:22px;
+  padding:12px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg, rgba(18,17,52,.95), rgba(10,8,28,.95));
+}
+.levelBadge .label{
+  color:#cad1ff; font-size:.8rem; letter-spacing:.12em; text-transform:uppercase
+}
+.levelBadge .num{
+  margin-top:4px;
+  font-size:clamp(2.4rem, 10vw, 4rem);
+  line-height:.9;
+  font-weight:900;
+  background:linear-gradient(180deg, #7ef2ff, #7a7dff 55%, #ef92ff);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+.heroBody{
+  display:grid;
+  grid-template-columns: 1fr 300px;
+  gap:14px;
+  margin-top:14px;
+}
+.statsCol{
+  display:flex; flex-direction:column; gap:12px;
+}
+.xpBlock{
+  background:rgba(8,10,28,.72);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:20px;
+  padding:14px;
+}
+.xpLine{
+  display:flex; justify-content:space-between; align-items:end; gap:12px; flex-wrap:wrap;
+}
+.muted{color:var(--muted)}
+.bigGreen{
+  color:var(--green);
+  font-size:clamp(1.15rem, 4vw, 1.8rem);
+  font-weight:900;
+  text-shadow:0 0 14px rgba(69,255,159,.15);
+}
+.xpBar{
+  margin-top:10px;
+  height:24px; border-radius:999px; overflow:hidden; position:relative;
+  background:#131133; border:1px solid rgba(255,255,255,.06);
+}
+.xpFill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg, #b451ff 0%, #7dd3fc 52%, #16d8ff 100%);
+  box-shadow:0 0 18px rgba(47,227,255,.22);
+  transition:width .35s ease;
+}
+.xpPct{
+  position:absolute; inset:0; display:grid; place-items:center; font-weight:900; font-size:.92rem;
+}
+.quickStats{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+.glowBox{
+  background:rgba(8,10,28,.72);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:20px;
+  padding:14px;
+}
+.glowBox .label{
+  color:#adb7ef; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase
+}
+.glowBox .value{
+  margin-top:6px; font-size:1.8rem; font-weight:900
+}
+.green{color:var(--green)} .purple{color:#d598ff} .cyan{color:var(--cyan)} .gold{color:var(--gold)}
+
+.cardTile{
+  border-radius:24px;
+  border:1px solid rgba(102,179,255,.18);
+  background:
+    radial-gradient(circle at 50% 15%, rgba(255,95,210,.14), transparent 26%),
+    radial-gradient(circle at 50% 85%, rgba(47,227,255,.12), transparent 24%),
+    linear-gradient(180deg, rgba(11,10,35,.95), rgba(7,6,18,.98));
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.photoWrap{
+  min-height:250px;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);
+  display:grid; place-items:center;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(168,85,247,.20), transparent 28%),
+    radial-gradient(circle at 55% 85%, rgba(47,227,255,.14), transparent 26%),
+    #0b0921;
+}
+.photoWrap img{width:100%; height:100%; object-fit:cover; display:block}
+.photoFallback{text-align:center; color:#d8dcff; padding:14px}
+.photoFallback div:first-child{font-size:4rem; margin-bottom:10px}
+.rankRow{
+  display:flex; justify-content:space-between; gap:12px; align-items:center;
+}
+.rankLabel{
+  color:#ffd76f; font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:.86rem;
+}
+.stars{color:#ffd25d; letter-spacing:.18em; font-size:1.05rem}
+.uploadRow{display:flex; gap:8px; flex-wrap:wrap}
+
+.section{padding:14px; margin-top:14px}
+.section h2{
+  margin:0 0 12px;
+  font-size:1.2rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.statGrid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:12px;
+}
+.stat{
+  background:rgba(10,11,31,.84);
+  border:1px solid rgba(168,85,247,.16);
+  border-radius:22px;
+  padding:14px;
+}
+.statTop{display:flex; gap:10px; align-items:center}
+.icon{
+  width:44px; height:44px; border-radius:14px; display:grid; place-items:center;
+  background:#151433; border:1px solid rgba(255,255,255,.05); font-size:1.25rem;
+}
+.stat .n{font-size:2rem; font-weight:900; margin-top:10px; line-height:1}
+.stat .t{color:#ced3f4; margin-top:8px}
+.abilityGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.ability{
+  background:rgba(10,11,31,.84);
+  border:1px solid rgba(47,227,255,.24);
+  border-radius:20px;
+  padding:14px;
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+}
+.ability.off{opacity:.42; border-color:rgba(255,255,255,.08)}
+.ability .left{display:flex; gap:12px; align-items:center}
+.ability .name{font-size:1rem; font-weight:800}
+.ability .sub{color:#8cf4ff; font-size:.9rem}
+.ability.off .sub{color:#b8b9ce}
+.dot{
+  width:12px; height:12px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px rgba(47,227,255,.5)
+}
+.ability.off .dot{background:#56556d; box-shadow:none}
+
+.logHeader{
+  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;
+}
+.logList{
+  display:flex; flex-direction:column; gap:10px; max-height:560px; overflow:auto;
+}
+.log{
+  background:rgba(10,11,31,.86);
+  border:1px solid rgba(168,85,247,.16);
+  border-radius:20px;
+  padding:14px;
+  display:grid;
+  grid-template-columns: 90px 1fr auto;
+  gap:10px;
+  align-items:center;
+}
+.time{color:#b7bde2; font-size:.88rem}
+.badge{
+  display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:6px 10px;
+  font-size:.82rem; font-weight:800;
+}
+.b-true{background:rgba(69,255,159,.12); color:var(--green); border:1px solid rgba(69,255,159,.2)}
+.b-false{background:rgba(255,111,143,.12); color:var(--red); border:1px solid rgba(255,111,143,.2)}
+.b-re{background:rgba(47,227,255,.12); color:var(--cyan); border:1px solid rgba(47,227,255,.2)}
+.b-verified{background:rgba(213,152,255,.12); color:#d598ff; border:1px solid rgba(213,152,255,.2)}
+.b-context{background:rgba(255,207,92,.12); color:var(--gold); border:1px solid rgba(255,207,92,.2)}
+.b-training{background:rgba(255,95,210,.12); color:var(--pink); border:1px solid rgba(255,95,210,.2)}
+.logTitle{font-weight:900}
+.logSub{color:#d1d5f1; font-size:.93rem; margin-top:4px}
+.xpTag{font-weight:900; color:#c7fbff; white-space:nowrap}
+
+.fab{
+  position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:30;
+  width:66px; height:66px; border-radius:22px; display:grid; place-items:center;
+  font-size:2rem; font-weight:900;
+}
+
+dialog{
+  border:none; width:min(96vw, 720px); max-width:720px; border-radius:24px;
+  padding:0; color:var(--text);
+  background:linear-gradient(180deg, rgba(15,12,38,.98), rgba(8,7,21,.98));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 30px 120px rgba(0,0,0,.45);
+}
+dialog::backdrop{background:rgba(3,2,12,.72); backdrop-filter:blur(8px)}
+.modalHead{
+  padding:16px 18px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.modalBody{padding:16px 18px 18px}
+.formGrid{
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px;
+}
+.row{margin-bottom:12px}
+label{display:block; font-size:.9rem; color:#d4d9ff; margin-bottom:6px}
+input,select,textarea{
+  width:100%; border:none; outline:none;
+  background:#0b0a20; color:#fff; border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:13px 12px; font:inherit;
+}
+textarea{min-height:92px; resize:vertical}
+.modalActions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
+.small{font-size:.85rem}
+.hint{font-size:.85rem; color:#9ea5d5}
+
+@media (max-width: 980px){
+  .grid, .heroBody, .statGrid, .abilityGrid{grid-template-columns:1fr}
+}
+@media (max-width: 640px){
+  .app{padding-left:10px; padding-right:10px}
+  .top{flex-direction:column; align-items:stretch}
+  .actions{justify-content:stretch}
+  .actions > *{flex:1}
+  .heroHeader{flex-direction:column}
+  .heroBody{grid-template-columns:1fr}
+  .quickStats{grid-template-columns:1fr}
+  .statGrid{grid-template-columns:1fr 1fr}
+  .abilityGrid{grid-template-columns:1fr}
+  .log{grid-template-columns:1fr; gap:8px}
+  .formGrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="logo">
+      <h1>DOKI TRACKER</h1>
+      <p>Emergent-style cosmic tracker, but yours and not subscription jail.</p>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="exportBtn">Export Data</button>
+      <label class="btn secondary" for="importFile">Import Data</label>
+      <input id="importFile" type="file" accept=".json" style="display:none">
+      <button class="secondary" id="resetTodayBtn">Reset Today XP</button>
+    </div>
+  </div>
+
+  <section class="panel hero">
+    <div class="heroInner">
+      <div class="heroHeader">
+        <div class="heroTitle">
+          <div class="heroTag">Legendary</div>
+          <h2 class="name" id="heroName">DOKI</h2>
+          <div class="role" id="heroRole">Autonomic Sentinel • Medical Response Specialist</div>
+        </div>
+        <div class="levelBadge">
+          <div class="label">Level</div>
+          <div class="num" id="levelNum">5</div>
+        </div>
+      </div>
+
+      <div class="heroBody">
+        <div class="statsCol">
+          <div class="xpBlock">
+            <div class="xpLine">
+              <div>
+                <div class="muted">XP</div>
+                <div class="bigGreen" id="xpText">470 / 500</div>
+              </div>
+              <div class="small muted" id="todayXp">Today: +15 XP</div>
+            </div>
+            <div class="xpBar">
+              <div class="xpFill" id="xpFill"></div>
+              <div class="xpPct" id="xpPct">94%</div>
+            </div>
+          </div>
+
+          <div class="quickStats">
+            <div class="glowBox green"><div class="label">Total XP</div><div class="value" id="totalXp">2470</div></div>
+            <div class="glowBox purple"><div class="label">Accuracy</div><div class="value" id="accuracy">85.7%</div></div>
+            <div class="glowBox cyan"><div class="label">Current Streak</div><div class="value" id="streak">4</div></div>
+            <div class="glowBox gold"><div class="label">Title</div><div class="value" id="titleMini" style="font-size:1.1rem">Specialist</div></div>
+          </div>
+
+          <div class="footerline" id="flavor">Verified before alerting • Trusted without question</div>
+        </div>
+
+        <div class="cardTile">
+          <div class="photoWrap">
+            <div class="photoFallback" id="photoFallback">
+              <div>🐩✨</div>
+              <div><strong>Add Doki's picture</strong></div>
+              <div class="hint">Best in real Safari after hosting. iPhone Files preview is the enemy.</div>
+            </div>
+            <img id="dogPhoto" alt="Doki photo" style="display:none" />
+          </div>
+          <div class="uploadRow">
+            <label class="btn" for="photoInput">Upload Doki Photo</label>
+            <input id="photoInput" type="file" accept="image/*" style="display:none">
+            <button class="ghost" id="clearPhotoBtn">Clear Photo</button>
+          </div>
+          <div class="rankRow">
+            <div class="rankLabel" id="rankLabel">Legendary Service Dog</div>
+            <div class="stars" id="stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="panel section">
+      <h2>Performance Stats</h2>
+      <div class="statGrid">
+        <div class="stat"><div class="statTop"><div class="icon">✅</div><div class="t">True Alerts</div></div><div class="n green" id="trueAlerts">12</div></div>
+        <div class="stat"><div class="statTop"><div class="icon">❌</div><div class="t">False Alerts</div></div><div class="n" style="color:var(--red)" id="falseAlerts">2</div></div>
+        <div class="stat"><div class="statTop"><div class="icon">🔁</div><div class="t">Re-Alerts</div></div><div class="n cyan" id="reAlerts">1</div></div>
+        <div class="stat"><div class="statTop"><div class="icon">🛡️</div><div class="t">Verified Checks</div></div><div class="n purple" id="verifiedChecks">1</div></div>
+        <div class="stat"><div class="statTop"><div class="icon">⚡</div><div class="t">Early Alerts</div></div><div class="n purple" id="earlyAlerts">0</div></div>
+        <div class="stat"><div class="statTop"><div class="icon">🎯</div><div class="t">Accuracy</div></div><div class="n gold" id="accuracyStat">85.7%</div></div>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <div class="logHeader">
+        <h2>Alert Log</h2>
+        <button id="openModalTop">+ Log Alert</button>
+      </div>
+      <div class="logList" id="logList"></div>
+    </section>
+  </div>
+
+  <section class="panel section">
+    <h2>Abilities</h2>
+    <div class="abilityGrid" id="abilityGrid"></div>
+    <div class="hint" style="margin-top:12px"><span id="abilityCount">5</span> / 10 unlocked</div>
+  </section>
+</div>
+
+<button class="fab" id="openModalFab">+</button>
+
+<dialog id="logModal">
+  <div class="modalHead">
+    <div>
+      <div style="font-weight:900;font-size:1.12rem">Log Doki Event</div>
+      <div class="hint">XP system A • Level curve B • full gremlin galaxy</div>
+    </div>
+    <button class="ghost" id="closeModal" type="button">Close</button>
+  </div>
+  <div class="modalBody">
+    <form id="logForm">
+      <div class="formGrid">
+        <div class="row">
+          <label for="eventType">Event Type</label>
+          <select id="eventType" required>
+            <option value="true_alert">True Alert</option>
+            <option value="false_alert">False Alert</option>
+            <option value="re_alert">Re-Alert</option>
+            <option value="verified_check">Verified Check</option>
+            <option value="contextual_alert">Contextual Alert</option>
+            <option value="training">Training Session</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="glucose">Glucose</label>
+          <input id="glucose" type="number" min="20" max="400" placeholder="e.g. 68">
+        </div>
+        <div class="row">
+          <label for="eventTime">Date & Time</label>
+          <input id="eventTime" type="datetime-local" required>
+        </div>
+        <div class="row">
+          <label for="behavior">Behavior</label>
+          <select id="behavior">
+            <option value="nose nudge">Nose Nudge</option>
+            <option value="chest lay">Chest Lay</option>
+            <option value="sniff check">Sniff Check</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="row"><label><input id="independent" type="checkbox"> Independent / unprompted (+5)</label></div>
+        <div class="row"><label><input id="dropping" type="checkbox"> Dropping / downward trend</label></div>
+        <div class="row"><label><input id="recovery" type="checkbox"> Recovery monitoring bonus</label></div>
+        <div class="row"><label><input id="sleepAlert" type="checkbox"> Woke from sleep to alert</label></div>
+        <div class="row"><label><input id="crossRoom" type="checkbox"> Cross-room search</label></div>
+        <div class="row"><label><input id="verifiedNoAlert" type="checkbox"> Checked and chose not to alert</label></div>
+      </div>
+      <div class="row">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Anything important about the event?"></textarea>
+      </div>
+      <div class="hint" id="xpPreview">Projected XP: 0</div>
+      <div class="modalActions">
+        <button class="secondary" type="button" id="previewXpBtn">Preview XP</button>
+        <button type="submit">Save Event</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+const STORAGE_KEY='dokiTrackerV2Emergent';
+const levelTitles={1:'Training Initiate',2:'Service Dog in Training',3:'Glucose Guardian',4:'Autonomic Sentinel',5:'Medical Response Specialist',6:'Predictive Sentinel',7:'Recovery Guardian',8:'Clinical Pattern Hunter',9:'Legendary Glucose Oracle',10:'Ultimate Companion'};
+const abilityDefs=[
+  {key:'early_detection',name:'Early Detection',emoji:'⚡',unlockLevel:2},
+  {key:'re_alerting',name:'Re-Alerting',emoji:'🔁',unlockLevel:3},
+  {key:'cross_room',name:'Cross-Room Search',emoji:'🔎',unlockLevel:4},
+  {key:'sleep_alerts',name:'Sleep Alerts',emoji:'🌙',unlockLevel:4},
+  {key:'judgment_call',name:'Judgment Call',emoji:'🧠',unlockLevel:5},
+  {key:'early_alerts',name:'Early Alerts',emoji:'⏱️',unlockLevel:6},
+  {key:'recovery_monitoring',name:'Recovery Monitoring',emoji:'📈',unlockLevel:6},
+  {key:'predictive_sensing',name:'Predictive Sensing',emoji:'👁️',unlockLevel:7},
+  {key:'verified_without_question',name:'Verified Without Question',emoji:'✔️',unlockLevel:8},
+  {key:'ultimate_companion',name:'Ultimate Companion',emoji:'❤️',unlockLevel:10},
+];
+const defaultState={
+  dogName:'Doki',
+  totalXP:2470,
+  todayXP:15,
+  photoDataUrl:'',
+  logs:[{
+    id:crypto.randomUUID(),
+    type:'true_alert',
+    time:'2026-03-25T10:57',
+    glucose:68,
+    behavior:'nose nudge',
+    notes:'Correct low response unprompted at 10:52 AM, 68 and dropping.',
+    independent:true,
+    dropping:true,
+    recovery:false,
+    sleepAlert:false,
+    crossRoom:false,
+    verifiedNoAlert:false,
+    xp:35
+  }]
+};
+function loadState(){
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw){localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultState)); return structuredClone(defaultState)}
+  try{return Object.assign(structuredClone(defaultState), JSON.parse(raw))}
+  catch(e){return structuredClone(defaultState)}
+}
+let state=loadState();
+function saveState(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}
+function xpNeededForLevel(level){if(level<=1)return 100; return 100*level}
+function cumulativeXPBeforeLevel(level){let total=0; for(let l=1;l<level;l++) total+=xpNeededForLevel(l); return total}
+function deriveLevelFromTotalXP(totalXP){let level=1; while(totalXP>=cumulativeXPBeforeLevel(level+1)) level++; return level}
+function xpIntoCurrentLevel(totalXP, level){return totalXP - cumulativeXPBeforeLevel(level)}
+function accuracy(trueAlerts,falseAlerts){const denom=trueAlerts+falseAlerts; if(!denom)return 100; return (trueAlerts/denom)*100}
+function countByType(type){return state.logs.filter(l=>l.type===type).length}
+function countEarlyAlerts(){return state.logs.filter(l=>l.type==='true_alert' && l.glucose && l.glucose>=60 && l.glucose<=70 && l.dropping).length}
+function currentStreak(){
+  let streak=0;
+  const logs=[...state.logs].sort((a,b)=>new Date(b.time)-new Date(a.time));
+  for(const l of logs){
+    if(['true_alert','re_alert','verified_check'].includes(l.type)) streak++;
+    else if(l.type==='false_alert') break;
+  }
+  return streak;
+}
+function projectedXP(entry){
+  let xp=0;
+  switch(entry.type){
+    case 'true_alert': xp+=25; break;
+    case 'false_alert': xp-=10; break;
+    case 're_alert': xp+=10; break;
+    case 'verified_check': xp+=10; break;
+    case 'contextual_alert': xp+=0; break;
+    case 'training': xp+=5; break;
+  }
+  if(entry.type==='true_alert' && entry.glucose && entry.glucose>=60 && entry.glucose<=70 && entry.dropping) xp+=5;
+  if(entry.independent && (entry.type==='true_alert' || entry.type==='verified_check')) xp+=5;
+  if(entry.recovery && (entry.type==='re_alert' || entry.type==='verified_check')) xp+=5;
+  if(entry.sleepAlert && entry.type==='true_alert') xp+=10;
+  if(entry.crossRoom && entry.type==='true_alert') xp+=5;
+  if(entry.verifiedNoAlert && entry.type==='verified_check') xp+=5;
+  return xp;
+}
+function typeBadge(type){
+  const map={
+    true_alert:['b-true','True Alert'],
+    false_alert:['b-false','False Alert'],
+    re_alert:['b-re','Re-Alert'],
+    verified_check:['b-verified','Verified Check'],
+    contextual_alert:['b-context','Contextual Alert'],
+    training:['b-training','Training']
+  };
+  return map[type] || ['b-context', type];
+}
+function formatWhen(dt){
+  const d=new Date(dt);
+  return d.toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+}
+function render(){
+  const level=deriveLevelFromTotalXP(state.totalXP);
+  const title=levelTitles[level] || 'Legendary Service Dog';
+  const need=xpNeededForLevel(level);
+  const current=xpIntoCurrentLevel(state.totalXP, level);
+  const pct=Math.max(0, Math.min(100, Math.round((current/need)*100)));
+
+  const trueAlerts=countByType('true_alert');
+  const falseAlerts=countByType('false_alert');
+  const reAlerts=countByType('re_alert');
+  const verifiedChecks=countByType('verified_check');
+  const earlyAlerts=countEarlyAlerts();
+  const acc=accuracy(trueAlerts, falseAlerts);
+
+  heroName.textContent=state.dogName.toUpperCase();
+  heroRole.textContent=`Autonomic Sentinel • ${title}`;
+  levelNum.textContent=level;
+  xpText.textContent=`${current} / ${need}`;
+  xpFill.style.width=`${pct}%`;
+  xpPct.textContent=`${pct}%`;
+  todayXp.textContent=`Today: ${state.todayXP>=0?'+':''}${state.todayXP} XP`;
+  totalXp.textContent=state.totalXP.toLocaleString();
+  accuracy.textContent=`${acc.toFixed(1)}%`;
+  streak.textContent=currentStreak();
+  titleMini.textContent=title.replace('Medical Response ','');
+  flavor.textContent=level>=5 ? 'Verified before alerting • Trusted without question' : 'Precision • Awareness • Reliability';
+  rankLabel.textContent=level>=5 ? 'Legendary Service Dog' : 'Cosmic Working Pup';
+  stars.textContent='★★★★★'.slice(0,Math.min(5,level)) || '★';
+
+  trueAlerts.textContent=trueAlerts;
+  falseAlerts.textContent=falseAlerts;
+  reAlerts.textContent=reAlerts;
+  verifiedChecks.textContent=verifiedChecks;
+  earlyAlerts.textContent=earlyAlerts;
+  accuracyStat.textContent=`${acc.toFixed(1)}%`;
+
+  abilityGrid.innerHTML='';
+  let unlocked=0;
+  for(const a of abilityDefs){
+    const active=level>=a.unlockLevel;
+    if(active) unlocked++;
+    const div=document.createElement('div');
+    div.className=`ability ${active?'':'off'}`;
+    div.innerHTML=`<div class="left"><div class="icon">${a.emoji}</div><div><div class="name">${a.name}</div><div class="sub">${active ? 'Active' : `Unlocks at Level ${a.unlockLevel}`}</div></div></div><div class="dot"></div>`;
+    abilityGrid.appendChild(div);
+  }
+  abilityCount.textContent=unlocked;
+
+  logList.innerHTML='';
+  const logs=[...state.logs].sort((a,b)=>new Date(b.time)-new Date(a.time));
+  if(!logs.length){
+    logList.innerHTML='<div class="hint">No alerts logged yet. Tap + and let Doki start farming XP.</div>';
+  } else {
+    for(const l of logs){
+      const [klass,label]=typeBadge(l.type);
+      const div=document.createElement('div');
+      div.className='log';
+      div.innerHTML=`<div class="time">${formatWhen(l.time)}</div><div><div class="logTitle"><span class="badge ${klass}">${label}</span></div><div class="logSub">${l.glucose ? `Glucose ${l.glucose}` : 'No glucose entered'}${l.behavior ? ` • ${l.behavior}` : ''}${l.notes ? ` • ${l.notes}` : ''}</div></div><div class="xpTag">${l.xp>=0?'+':''}${l.xp} XP</div>`;
+      logList.appendChild(div);
+    }
+  }
+
+  if(state.photoDataUrl){
+    dogPhoto.src=state.photoDataUrl;
+    dogPhoto.style.display='block';
+    photoFallback.style.display='none';
+  } else {
+    dogPhoto.style.display='none';
+    photoFallback.style.display='block';
+  }
+  saveState();
+}
+function openModal(){
+  const dt=new Date();
+  dt.setMinutes(dt.getMinutes()-dt.getTimezoneOffset());
+  eventTime.value=dt.toISOString().slice(0,16);
+  logModal.showModal();
+}
+function closeModal(){logModal.close()}
+function formToEntry(assignId=true){
+  const entry={
+    id:assignId ? crypto.randomUUID() : 'preview',
+    type:eventType.value,
+    glucose:Number(glucose.value)||null,
+    time:eventTime.value,
+    behavior:behavior.value,
+    notes:notes.value.trim(),
+    independent:independent.checked,
+    dropping:dropping.checked,
+    recovery:recovery.checked,
+    sleepAlert:sleepAlert.checked,
+    crossRoom:crossRoom.checked,
+    verifiedNoAlert:verifiedNoAlert.checked
+  };
+  entry.xp=projectedXP(entry);
+  return entry;
+}
+openModalFab.onclick=openModal;
+openModalTop.onclick=openModal;
+closeModal.onclick=closeModal;
+previewXpBtn.onclick=()=>{const e=formToEntry(false); xpPreview.textContent=`Projected XP: ${projectedXP(e)>=0?'+':''}${projectedXP(e)}`};
+logForm.addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const entry=formToEntry(true);
+  state.logs.push(entry);
+  state.totalXP+=entry.xp;
+  state.todayXP+=entry.xp;
+  render();
+  closeModal();
+  e.target.reset();
+  xpPreview.textContent='Projected XP: 0';
+});
+exportBtn.onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`doki-tracker-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+importFile.addEventListener('change', async (e)=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  try{
+    state=Object.assign(structuredClone(defaultState), JSON.parse(await file.text()));
+    render();
+    alert('Doki data imported.');
+  } catch(err){
+    alert('That import file looks cursed. Try a valid JSON backup.');
+  }
+  e.target.value='';
+});
+photoInput.addEventListener('change',(e)=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{state.photoDataUrl=reader.result; render()};
+  reader.readAsDataURL(file);
+  e.target.value='';
+});
+clearPhotoBtn.onclick=()=>{state.photoDataUrl=''; render()};
+resetTodayBtn.onclick=()=>{
+  if(confirm('Reset Today XP to 0? This does not delete logs.')){
+    state.todayXP=0;
+    render();
+  }
+};
+render();
+</script>
+</body>
+</html>
